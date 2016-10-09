@@ -10,7 +10,7 @@ vagrant:
       type: virtualbox
       options:
         memory: 512
-        cpus: 2
+        cpus: 1
   instances:
     - name: openresty
       ansible_groups:

@@ -38,7 +38,7 @@ http {
         }
 {% if php7 | default(false) %}
         location ~\.php$ {
-            include snippets/fastcgi-php.conf;
+            include /etc/nginx/snippets/fastcgi-php.conf;
             fastcgi_pass unix:/run/php/php7.0-fpm.sock;
             fastcgi_param   SCRIPT_FILENAME    $document_root$fastcgi_script_name;
             fastcgi_param   SCRIPT_NAME        $fastcgi_script_name;
@@ -46,7 +46,7 @@ http {
         }
 {% elif php5 | default(false) %}
         location ~\.php$ {
-            include snippets/fastcgi-php.conf;
+            include /etc/nginx/snippets/fastcgi-php.conf;
             fastcgi_pass unix:/run/php/php5-fpm.sock;
             fastcgi_param   SCRIPT_FILENAME    $document_root$fastcgi_script_name;
             fastcgi_param   SCRIPT_NAME        $fastcgi_script_name;

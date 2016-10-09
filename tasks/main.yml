@@ -40,7 +40,7 @@
   set_fact:
     openresty_version={{ openrestyversion.stdout}}
     openresty_url={{ openrestyurl.stdout }}
-    nginx_ver={{ nginxver.stdout }}
+    nginx_ver={{ nginxver.stderr.split()[2] }}
 
 # This will run only if openresty is not installed yet
 - block:
