@@ -11,7 +11,7 @@ galaxy_info:
   - name: Centos
     versions:
     - all
-  categories:
+  galaxy_tags:
   - web
 
 dependencies: []
