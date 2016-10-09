@@ -1,0 +1,11 @@
+---
+# This may vary for centos and fedora
+with_sha1: "/usr/include/openssl"
+with_md5: "/usr/include/openssl"
+ssl: 0
+force_https: 0
+CORS: 0
+#server_name: "some.site.name"
+#workers: 1
+#php7: 1
+#php5: 0

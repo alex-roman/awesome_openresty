@@ -1,0 +1,124 @@
+---
+##
+#
+# This is an openresty installer.
+# - Gets latest version from github
+# - Compares with currently installed if any
+# - Updates/install openresty and nginx if needed
+# - Adds SSL support if passed via vars
+# - Validates and add nginx.conf from templates/nginx.conf.j2 
+# - Deletes .defaults from nginx folder
+#
+##
+
+# Cos shit don't give a fun about best language ever
+- name: Bootstrap host with python
+  raw: apt-get -y install python python-simplejson
+  
+# Install jq for parsing github's json
+- name: Installing jq tool for parsing
+  apt: name=jq
+  
+# Get latest version, check current nginx installation and register them as vars.
+- name: Get URL of latest openresty
+  shell: curl https://api.github.com/repos/openresty/openresty/releases/latest | jq -r .assets[0].browser_download_url
+  register: openrestyurl
+  ignore_errors: True
+
+- name: Get version of latest openresty
+  shell: curl https://api.github.com/repos/openresty/openresty/releases/latest | jq -r .tag_name | cut -c 2-
+  register: openrestyversion
+  ignore_errors: True
+
+- name: Check if openresty already installed...
+  shell: nginx -v
+  register: nginxver
+  ignore_errors: True
+
+# Convert registered variables to facts (easy to read and manipulate)
+- name: Convert registered vars to facts
+  set_fact:
+    openresty_version={{ openrestyversion.stdout}}
+    openresty_url={{ openrestyurl.stdout }}
+    nginx_ver={{ nginxver.stderr.split()[2] }}
+
+# This will run only if openresty is not installed yet
+- block:
+  - name: Update apt
+    apt: update_cache=yes
+
+  - name: Install required packages to compile Openresty from source
+    apt: name={{ item }}
+    with_items:
+      - nginx-extras
+      - build-essential
+      - libreadline-dev
+      - make
+      - libncurses5-dev
+      - libpcre3-dev
+      - libssl-dev
+      - perl
+      - libxml2-dev     #Optional. See templates/configure_script.j2
+      - libxslt-dev     #Optional. See templates/configure_script.j2
+      - libgd-dev       #Optional. See templates/configure_script.j2
+      - libgeoip-dev    #Optional. See templates/configure_script.j2
+      - libpq-dev       #Optional. See templates/configure_script.j2
+      - libgd2-xpm-dev  #Optional. See templates/configure_script.j2
+      - libxslt1-dev    #Optional. See templates/configure_script.j2
+
+  - name: Download Openresty source
+    get_url: url={{ openresty_url }} dest=/tmp/openresty.tar.gz mode=0440
+
+  - name: Extract Openresty tarball
+    unarchive: src=/tmp/openresty.tar.gz dest=/tmp/ copy=no
+
+  - name: Build configure command
+    template: src=configure.j2 dest=/tmp/openresty-{{ openresty_version }}/install_openresty.sh mode=0777
+
+  - name: Configure Openresty
+    command: chdir=/tmp/openresty-{{ openresty_version }} ./install_openresty.sh
+
+  - name: Compile Openresty
+    command: chdir=/tmp/openresty-{{ openresty_version }} make
+
+  - name: Install Openresty
+    command: chdir=/tmp/openresty-{{ openresty_version }} make install
+    notify: Restart nginx
+
+  when: nginx_ver.find(openresty_version) == -1
+
+
+# This is for default vhost. If you have more than one SSL vhost just duplicate this
+- block:
+  - name: Creating dir for SSL cert/key
+    file: path=/etc/nginx/ssl state=directory mode=0640 group=www-data
+  
+  - name: Installing SSL key
+    template: src=infinora.key dest=/etc/nginx/ssl/default.key
+
+  - name: Installing SSL certificate
+    template: src=infinora.crt dest=/etc/nginx/ssl/default.crt
+
+  - name: Check if dhparam generated
+    shell: ls /etc/nginx/dhparam.pem
+    register: dhparam_pem
+    ignore_errors: True
+
+  - name: DHParam generation
+    shell: openssl dhparam -out /etc/nginx/dhparam.pem 2048
+    when: dhparam_pem.rc != 0
+  when: ssl == 1
+
+- name: Add nginx config from template
+  template:
+    src=nginx.conf.j2
+    dest=/etc/nginx/nginx.conf
+    validate='nginx -t -c %s'
+  notify: Restart nginx
+ 
+# with_fileglob doesn't work as I expect. More tests needed
+- name: Delete sample files
+  shell: rm -rf /etc/nginx/*.default
+#  file: name=/etc/nginx/{{ item }} state=absent
+#  with_fileglob:
+#    - /etc/nginx/*default
