@@ -4,7 +4,7 @@ with_sha1: "/usr/include/openssl"
 with_md5: "/usr/include/openssl"
 ssl: 1
 force_https: 1
-CORS: 1
+CORS: 0
 #server_name: "some.site.name"
 #workers: 1
 #php7: 1
