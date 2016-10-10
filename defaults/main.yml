@@ -10,3 +10,4 @@ CORS: 0
 #workers: 1
 #php7: 1
 #php5: 0
+stub_status: True
