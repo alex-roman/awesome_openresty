@@ -5,6 +5,7 @@ with_md5: "/usr/include/openssl"
 ssl: 0
 force_https: 0
 CORS: 0
+#document_root: "/var/www/html"
 #server_name: "some.site.name"
 #workers: 1
 #php7: 1

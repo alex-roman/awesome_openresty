@@ -19,7 +19,7 @@ http {
 {% if not force_https %}
         listen 80 reuseport default_server;
 {% endif %}
-        root /var/www/html;
+        root {{ document_root | default('/var/www/html') }};
         index index.html index.htm index.php;
         server_name {{ server_name | default(inventory_hostname) }} "" _;
         resolver 8.8.8.8;

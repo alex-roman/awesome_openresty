@@ -12,9 +12,10 @@ You can find more info on a [Github](https://github.com/openresty/lua-nginx-modu
 - Has pre-configured **molecule**.yml for testing your adjustements
 
 #### Parameters (here is default values)
-- `ssl: 1` - Add SSL block to nginx.conf. Make sure you place default.key and default.crt into templates folder.
-- `force_https: 1` - Redirect all the incoming traffic to HTTPS
+- `ssl: 0` - Add SSL block to nginx.conf. Make sure you place default.key and default.crt into templates folder.
+- `force_https: 0` - Redirect all the incoming traffic to HTTPS
 - `CORS: 0` - Add headers for Cross Origin Resources Sharing
+- `document_root: "/var/www/html"` - Customize root directory for default vhost
 - `server_name: ansible_inventory_name` - Ansible hostname here by default
 - `workers: auto` - Set number of simultaneously running processes. 
   Auto means nginx will get the number of cores on your box and run worker for each core. Limit this for dev/staging.
