@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/prozacUa/ansible_role_test.svg?branch=master)](https://travis-ci.org/prozacUa/ansible_role_test)
+[![Build Status](https://travis-ci.org/prozacUa/awesome_openresty.svg?branch=master)](https://travis-ci.org/prozacUa/awesome_openresty)
 
 OpenResty is a bundle of Nginx web server with additional libraries and enhanced features set. 
 You can find more info on a [Github](https://github.com/openresty/lua-nginx-module) and official [Openresty.org](https://openresty.org)
