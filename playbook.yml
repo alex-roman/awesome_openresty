@@ -1,4 +1,13 @@
 ---
 - hosts: all
+  vars:
+    ssl: False
+    force_https: True
+    CORS: True
+    document_root: "/www"
+    server_name: "SUPERSERVER"
+    workers: 2
+    php7: False
+    stub_status: True
   roles:
     - role: openresty

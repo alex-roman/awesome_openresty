@@ -94,10 +94,12 @@
     file: path=/etc/nginx/ssl state=directory mode=0640 group=www-data
 
   - name: Installing SSL key
-    template: src=infinora.key dest=/etc/nginx/ssl/default.key
+    template: src=default.key dest=/etc/nginx/ssl/default.key
+    ignore_errors: True
 
   - name: Installing SSL certificate
-    template: src=infinora.crt dest=/etc/nginx/ssl/default.crt
+    template: src=default.crt dest=/etc/nginx/ssl/default.crt
+    ignore_errors: True
 
   - name: Check if dhparam generated
     shell: ls /etc/nginx/dhparam.pem
@@ -108,6 +110,9 @@
     shell: openssl dhparam -out /etc/nginx/dhparam.pem 2048
     when: dhparam_pem.rc != 0
   when: ssl == 1
+
+- name: Check DocRoot
+  file: path={{ document_root }} state=directory
 
 - name: Add nginx config from template
   template:
