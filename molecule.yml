@@ -3,7 +3,7 @@ driver:
   name: vagrant
 vagrant:
   platforms:
-    - name: ansible_xenial64
+    - name: ansible_ubuntu16
       box: marcv81/xenial64
   providers:
     - name: virtualbox

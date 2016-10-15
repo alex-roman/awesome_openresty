@@ -19,10 +19,11 @@ http {
 {% if not force_https %}
         listen 80 reuseport default_server;
 {% endif %}
-        root /var/www/html;
+        root {{ document_root | default('/var/www/html') }};
         index index.html index.htm index.php;
         server_name {{ server_name | default(inventory_hostname) }} "" _;
         resolver 8.8.8.8;
+        charset utf-8;
         gzip off; #Because of gzip ssl issue
 {% if ssl | default(false) %}
         ssl_certificate /etc/nginx/ssl/default.crt;
@@ -56,12 +57,17 @@ http {
         location ~ /\.ht {
             deny all;
         }
+{% if stub_status | default(false) %}
+        location /stub_status {
+            stub_status;
+        }
+{% endif %}
     }
 {% if force_https | default(false) %}
     server {
         listen 80 reuseport;
         server_name {{ server_name | default(inventory_hostname) }} "" _;
-        return 301 https://$server_name$request_uri;
+        return 301 https://$host$request_uri;
         gzip on;
     }
 {% endif %}

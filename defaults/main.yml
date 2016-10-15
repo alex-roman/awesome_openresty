@@ -3,9 +3,11 @@
 with_sha1: "/usr/include/openssl"
 with_md5: "/usr/include/openssl"
 ssl: 0
-force_https: 1
+force_https: 0
 CORS: 0
+#document_root: "/var/www/html"
 #server_name: "some.site.name"
 #workers: 1
 #php7: 1
 #php5: 0
+stub_status: True
