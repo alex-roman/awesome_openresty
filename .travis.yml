@@ -1,0 +1,24 @@
+---
+language: python
+sudo: required
+
+git:
+  depth: 1
+
+env:
+  - distro: ubuntu1604
+    init: /lib/systemd/systemd
+    run_opts: "--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro"
+
+services:
+  - docker
+
+before_install:
+  - container_id=$(date +%s)
+  - 'docker run --detach --volume="${PWD}":/etc/ansible/roles/openresty:ro ${run_opts} geerlingguy/docker-${distro}-ansible:latest "${init}" > "${container_id}"'
+
+
+script:
+  - 'docker exec --tty "$(cat ${container_id})" env TERM=xterm
+    ansible-playbook /etc/ansible/roles/openresty/tests/test.yml
+    --syntax-check'
