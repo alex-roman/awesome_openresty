@@ -6,7 +6,7 @@
 # - Compares with currently installed if any
 # - Updates/install openresty and nginx if needed
 # - Adds SSL support if passed via vars
-# - Validates and add nginx.conf from templates/nginx.conf.j2 
+# - Validates and add nginx.conf from templates/nginx.conf.j2
 # - Deletes .defaults from nginx folder
 #
 ##
@@ -14,11 +14,11 @@
 # Cos shit don't give a fun about best language ever
 - name: Bootstrap host with python
   raw: apt-get -y install python python-simplejson
-  
+
 # Install jq for parsing github's json
 - name: Installing jq tool for parsing
   apt: name=jq
-  
+
 # Get latest version, check current nginx installation and register them as vars.
 - name: Get URL of latest openresty
   shell: curl https://api.github.com/repos/openresty/openresty/releases/latest | jq -r .assets[0].browser_download_url
@@ -66,7 +66,7 @@
       - libgd2-xpm-dev  #Optional. See templates/configure_script.j2
       - libxslt1-dev    #Optional. See templates/configure_script.j2
 
-  - name: Download Openresty source
+  - name: Download Openresty source from {{ openresty_url }}
     get_url: url={{ openresty_url }} dest=/tmp/openresty.tar.gz mode=0440
 
   - name: Extract Openresty tarball
@@ -81,7 +81,7 @@
   - name: Compile Openresty
     command: chdir=/tmp/openresty-{{ openresty_version }} make
 
-  - name: Install Openresty
+  - name: Install Openresty ({{openresty_version}})
     command: chdir=/tmp/openresty-{{ openresty_version }} make install
     notify: Restart nginx
 
@@ -92,12 +92,14 @@
 - block:
   - name: Creating dir for SSL cert/key
     file: path=/etc/nginx/ssl state=directory mode=0640 group=www-data
-  
+
   - name: Installing SSL key
-    template: src=infinora.key dest=/etc/nginx/ssl/default.key
+    template: src=default.key dest=/etc/nginx/ssl/default.key
+    ignore_errors: True
 
   - name: Installing SSL certificate
-    template: src=infinora.crt dest=/etc/nginx/ssl/default.crt
+    template: src=default.crt dest=/etc/nginx/ssl/default.crt
+    ignore_errors: True
 
   - name: Check if dhparam generated
     shell: ls /etc/nginx/dhparam.pem
@@ -109,6 +111,9 @@
     when: dhparam_pem.rc != 0
   when: ssl == 1
 
+- name: Check DocRoot
+  file: path={{ document_root }} state=directory
+
 - name: Add nginx config from template
   template:
     src=nginx.conf.j2
@@ -116,10 +121,10 @@
     backup=yes
     validate='nginx -t -c %s'
   notify: Restart nginx
- 
+
 # with_fileglob doesn't work as I expect. More tests needed
 - name: Delete sample files
-  shell: rm -rf /etc/nginx/*.default
-#  file: name=/etc/nginx/{{ item }} state=absent
-#  with_fileglob:
-#    - /etc/nginx/*default
+#  shell: rm -rf /etc/nginx/*.default
+  file: name=/etc/nginx/{{ item }} state=absent
+  with_fileglob:
+    - /etc/nginx/*.default
