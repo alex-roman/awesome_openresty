@@ -1,8 +1,9 @@
-tests/.vagrant
-ubuntu-xenial-16.04-cloudimg-console.log
-.molecule
-.vagrant
+tests/*.vagrant
+*.log
+*.molecule
+*.vagrant
 playbook.retry
+playbook.yml
 templates/*.pem
 templates/*.crt
 templates/*.key
