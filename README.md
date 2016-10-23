@@ -53,6 +53,9 @@ You can find more info on a [Github](https://github.com/openresty/lua-nginx-modu
     - role: openresty
 ```
 
+#### Testing
+I'm using [molecule](https://github.com/metacloud/molecule) for testing ansible roles. You can find vagrant (virtualbox) related molecule.yml in root dir. Please install `pip install molecule` and run `molecule init` to initialize your testing env. Run `molecule test` when finish adjusting role to your needs.
+
 #### ToDo
 - LuaRocks support
 - Nginx amplify integration

@@ -65,7 +65,7 @@
       - libgd2-xpm-dev  #Optional. See templates/configure_script.j2
       - libxslt1-dev    #Optional. See templates/configure_script.j2
 
-  - name: Download Openresty source
+  - name: Download Openresty source from {{ openresty_url }}
     get_url: url={{ openresty_url }} dest=/tmp/openresty.tar.gz mode=0440
 
   - name: Extract Openresty tarball
@@ -80,7 +80,7 @@
   - name: Compile Openresty
     command: chdir=/tmp/openresty-{{ openresty_version }} make
 
-  - name: Install Openresty
+  - name: Install Openresty ({{openresty_version}})
     command: chdir=/tmp/openresty-{{ openresty_version }} make install
     notify: Restart nginx
 

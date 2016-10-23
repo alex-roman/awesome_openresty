@@ -8,3 +8,4 @@ templates/*.pem
 templates/*.crt
 templates/*.key
 templates/*.bundle
+templates/*.conf
