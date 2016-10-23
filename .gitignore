@@ -1,17 +1,9 @@
-<<<<<<< HEAD
 tests/*.vagrant
 *.log
 *.molecule
 *.vagrant
 playbook.retry
 playbook.yml
-=======
-tests/.vagrant
-ubuntu-xenial-16.04-cloudimg-console.log
-.molecule
-.vagrant
-playbook.retry
->>>>>>> 67066dc68dfcf97ecaed85cebf2fd8eb91fc5999
 templates/*.pem
 templates/*.crt
 templates/*.key

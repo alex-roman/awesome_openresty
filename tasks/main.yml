@@ -1,6 +1,5 @@
 ---
 ##
-#
 # This is an openresty installer.
 # - Gets latest version from github
 # - Compares with currently installed if any
@@ -94,11 +93,11 @@
     file: path=/etc/nginx/ssl state=directory mode=0640 group=www-data
 
   - name: Installing SSL key
-    template: src=default.key dest=/etc/nginx/ssl/default.key
+    template: src='{{ openresty_ssl_key | default(inventory_hostname) }}' dest='/etc/nginx/ssl/{{ openresty_ssl_key | default(inventory_hostname) }}'
     ignore_errors: True
 
   - name: Installing SSL certificate
-    template: src=default.crt dest=/etc/nginx/ssl/default.crt
+    template: src='{{ openresty_ssl_crt | default(inventory_hostname) }}' dest='/etc/nginx/ssl/{{ openresty_ssl_crt | default(inventory_hostname) }}'
     ignore_errors: True
 
   - name: Check if dhparam generated
@@ -109,10 +108,15 @@
   - name: DHParam generation
     shell: openssl dhparam -out /etc/nginx/dhparam.pem 2048
     when: dhparam_pem.rc != 0
-  when: ssl == 1
+  when: openresty_ssl
+
+
+- name: Add include-file to nginx conf directory
+  template: src='{{ openresty_server_include }}' dest='/etc/nginx/{{ openresty_server_include }}'
+  when: openresty_server_include != False
 
 - name: Check DocRoot
-  file: path={{ document_root }} state=directory
+  file: path='{{ openresty_document_root }}' state=directory
 
 - name: Add nginx config from template
   template:
@@ -125,6 +129,6 @@
 # with_fileglob doesn't work as I expect. More tests needed
 - name: Delete sample files
 #  shell: rm -rf /etc/nginx/*.default
-  file: name=/etc/nginx/{{ item }} state=absent
+  file: name='/etc/nginx/{{ item }}' state=absent
   with_fileglob:
     - /etc/nginx/*.default

@@ -1,13 +1,19 @@
 ---
 - hosts: all
   vars:
-    ssl: False
-    force_https: True
-    CORS: True
-    document_root: "/www"
-    server_name: "SUPERSERVER"
-    workers: 2
-    php7: False
-    stub_status: True
+    openresty_ssl: False
+    openresty_force_https: False
+    openresty_CORS: False
+    openresty_document_root: False
+    openresty_server_name: False
+    openresty_workers: 1
+    openresty_php7: False
+    openresty_php5: False
+    openresty_stub_status: True
+    openresty_ssl_crt: '{{ inventory_hostname }}'
+    openresty_ssl_key: '{{ inventory_hostname }}'
+    openresty_http_string: False
+    openresty_server_string: False
+    openresty_server_include: False
   roles:
     - role: openresty

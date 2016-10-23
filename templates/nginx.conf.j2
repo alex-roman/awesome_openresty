@@ -1,10 +1,10 @@
 # all-in-one nginx config
 
 user www-data;
-worker_processes {{ workers | default('auto') }};
+worker_processes {{ openresty_workers | default('auto') }};
 worker_cpu_affinity auto;
 pid /run/nginx.pid;
-worker_rlimit_nofile 100000; 
+worker_rlimit_nofile 100000;
 
 events {
     worker_connections 8192;
@@ -16,18 +16,18 @@ http {
     server {
         listen 443 reuseport ssl;
         listen [::]:443 reuseport ssl ;
-{% if not force_https %}
+{% if not openresty_force_https %}
         listen 80 reuseport default_server;
 {% endif %}
-        root {{ document_root | default('/var/www/html') }};
+        root {{ openresty_document_root | default('/var/www/html') }};
         index index.html index.htm index.php;
-        server_name {{ server_name | default(inventory_hostname) }} "" _;
+        server_name {{ openresty_server_name | default(inventory_hostname) }} "" _;
         resolver 8.8.8.8;
         charset utf-8;
         gzip off; #Because of gzip ssl issue
-{% if ssl | default(false) %}
-        ssl_certificate /etc/nginx/ssl/default.crt;
-        ssl_certificate_key /etc/nginx/ssl/default.key;
+{% if openresty_ssl | default(false) %}
+        ssl_certificate /etc/nginx/ssl/{{ openresty_ssl_crt }};
+        ssl_certificate_key /etc/nginx/ssl/{{ openresty_ssl_key }};
         ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
         ssl_prefer_server_ciphers on;
         ssl_ciphers ECDH+AESGCM:ECDH+AES256:ECDH+AES128:DH+3DES:!ADH:!AECDH:!MD;
@@ -37,7 +37,7 @@ http {
         location / {
             try_files $uri $uri/ =404;
         }
-{% if php7 | default(false) %}
+{% if openresty_php7 | default(false) %}
         location ~\.php$ {
             include /etc/nginx/snippets/fastcgi-php.conf;
             fastcgi_pass unix:/run/php/php7.0-fpm.sock;
@@ -45,7 +45,7 @@ http {
             fastcgi_param   SCRIPT_NAME        $fastcgi_script_name;
             fastcgi_read_timeout 300;
         }
-{% elif php5 | default(false) %}
+{% elif openresty_php5 | default(false) %}
         location ~\.php$ {
             include /etc/nginx/snippets/fastcgi-php.conf;
             fastcgi_pass unix:/run/php/php5-fpm.sock;
@@ -57,16 +57,18 @@ http {
         location ~ /\.ht {
             deny all;
         }
-{% if stub_status | default(false) %}
+{% if openresty_stub_status | default(false) %}
         location /stub_status {
             stub_status;
         }
 {% endif %}
+        {% if openresty_server_string | default(false) %}{{ openresty_server_string }};{% endif %}
+        {% if openresty_server_include | default(false) %}include /etc/nginx/{{ openresty_server_include }};{% endif %}
     }
-{% if force_https | default(false) %}
+{% if openresty_force_https | default(false) %}
     server {
         listen 80 reuseport;
-        server_name {{ server_name | default(inventory_hostname) }} "" _;
+        server_name {{ openresty_server_name | default(inventory_hostname) }} "" _;
         return 301 https://$host$request_uri;
         gzip on;
     }
@@ -89,8 +91,8 @@ http {
     proxy_max_temp_file_size 0;
     server_tokens off;
     default_type text/html;
-    
-{% if CORS | default(false) %}
+
+{% if openresty_CORS | default(false) %}
     add_header 'Access-Control-Allow-Origin' '*';
     add_header 'Access-Control-Allow-Credentials' 'true';
     add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS';
@@ -105,4 +107,5 @@ http {
     include /etc/nginx/mime.types;
     include /etc/nginx/conf.d/*.conf;
     include /etc/sites-enabled/*.conf;
+    {% if openresty_http_string | default(false) %}{{ openresty_http_string }};{% endif %}
 }
