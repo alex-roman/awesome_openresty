@@ -11,8 +11,8 @@ openresty_workers: 1
 openresty_php7: False
 openresty_php5: False
 openresty_stub_status: True
-openresty_ssl_crt: '{{ inventory_hostname }}'
-openresty_ssl_key: '{{ inventory_hostname }}'
+openresty_ssl_crt: '{{ inventory_hostname }}.crt'
+openresty_ssl_key: '{{ inventory_hostname }}.key'
 openresty_http_string: False
 openresty_server_string: False
 openresty_server_include: False

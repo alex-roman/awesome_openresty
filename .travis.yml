@@ -3,7 +3,10 @@ language: python
 sudo: required
 
 git:
-  depth: 1
+  depth: 2
+
+notifications:
+  webhooks: https://galaxy.ansible.com/api/v1/notifications/
 
 env:
   - distro: ubuntu1604
