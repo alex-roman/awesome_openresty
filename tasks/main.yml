@@ -10,7 +10,6 @@
 #
 ##
 
-# Cos shit don't give a fun about best language ever
 - name: Bootstrap host with python
   raw: apt-get -y install python python-simplejson
 
@@ -117,6 +116,12 @@
 
 - name: Check DocRoot
   file: path='{{ openresty_document_root }}' state=directory
+
+- name: Add absolute path to snippets/fastcgi if exists
+  replace: 
+    dest=/etc/nginx/snippets/fastcgi-php.conf
+    regexp='^include fastcgi.conf;'
+    replace='include /etc/nginx/fastcgi.conf;'
 
 - name: Add nginx config from template
   template:

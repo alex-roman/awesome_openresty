@@ -3,7 +3,6 @@ tests/*.vagrant
 *.molecule
 *.vagrant
 playbook.retry
-playbook.yml
 templates/*.pem
 templates/*.crt
 templates/*.key
